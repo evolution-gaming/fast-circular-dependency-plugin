@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+      "target": "ES2017",
+      "module": "commonjs",
+      "sourceMap": true,
+      "outDir": "build",
+      "allowJs": true,
+      "declaration": true,
+
+      "strict": true,
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "noImplicitReturns": true,
+      "noFallthroughCasesInSwitch": true,
+
+      "moduleResolution": "node",
+      "esModuleInterop": true,
+      "assumeChangesOnlyAffectDirectDependencies": true,
+      "forceConsistentCasingInFileNames": true
+    },
+
+    "include": [
+        "index.ts",
+
+        // just for linting purposes
+        "__tests__/index.test.ts",
+        "jest.config.js",
+        ".eslintrc.js"
+    ]
+  }
