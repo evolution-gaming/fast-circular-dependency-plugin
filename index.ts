@@ -1,22 +1,26 @@
 import path from 'path';
-import {
-    type Compiler, type Compilation, type NormalModule, type WebpackError,
-} from 'webpack';
+import type { Compiler, Compilation, WebpackError } from 'webpack';
 import Graph from 'tarjan-graph';
 
 const PLUGIN_NAME = 'FastCircularDependencyPlugin';
 
 export interface IFastCircularDependencyPluginOptions {
-    /** if provided, cycles where every module path matches this regex will not be reported */
+    /** If provided, cycles where every module path matches this regex will not be reported.  */
     exclude?: RegExp;
     /** if provided, only cycles where at least one module path matches this regex will be reported */
     include?: RegExp;
-    /** if true, the plugin will cause the build to fail if a circular dependency is detected */
+    /**
+     * If true, the plugin will cause the build to fail if a circular dependency is detected.
+     * "false" by default. Has no effect if "onDetected" is provided.
+     */
     failOnError?: boolean;
     /** if true, the plugin will not report cycles that include an async dependency, e.g. via import(/* webpackMode: "weak" / './file.js') */
     allowAsyncCycles?: boolean;
-    /** called when a cycle is detected, any exception thrown by this callback will be added to compilation errors */
-    onDetected?: ((options: { module: NormalModule, paths: string[], compilation: Compilation }) => void) | null;
+    /**
+     * Called when a cycle is detected, any exception thrown by this callback will be added to compilation errors.
+     * If not provided, the plugin will automatically add a warning or error to the compilation, depending on the value of "failOnError".
+     */
+    onDetected?: ((options: { paths: string[], compilation: Compilation }) => void) | null;
     /** called before the cycle detection starts */
     onStart?: ((options: { compilation: Compilation }) => void) | null;
     /** called after the cycle detection ends */
@@ -48,15 +52,12 @@ export default class FastCircularDependencyPlugin {
                 this.options.onStart?.({ compilation });
 
                 const graph = new Graph();
-                const hasOnDetectedCallback = !!this.options.onDetected;
-                const resourceToModuleMapping = hasOnDetectedCallback ? new Map<string, NormalModule>() : null;
 
                 for (const module of modules) {
                     if (!(module instanceof compiler.webpack.NormalModule) || !module.resource) {
                         continue;
                     }
 
-                    resourceToModuleMapping?.set(module.resource, module);
                     const dependencyResources = [];
 
                     for (const dependency of module.dependencies) {
@@ -75,7 +76,6 @@ export default class FastCircularDependencyPlugin {
                             continue;
                         }
 
-                        resourceToModuleMapping?.set(module.resource, module);
                         dependencyResources.push(dependencyModule.resource);
                     }
                     graph.add(module.resource, dependencyResources);
@@ -94,7 +94,6 @@ export default class FastCircularDependencyPlugin {
                     if (this.options.onDetected) {
                         try {
                             this.options.onDetected({
-                                module: resourceToModuleMapping!.get(cycle[0].name)!,
                                 paths: cycleModulePaths,
                                 compilation,
                             });
