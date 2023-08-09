@@ -1,62 +1,28 @@
 import path from 'path';
 import {
-    type Compiler, type Compilation, NormalModule, WebpackError,
+    type Compiler, type Compilation, type NormalModule, type WebpackError,
 } from 'webpack';
 import Graph from 'tarjan-graph';
 
 const PLUGIN_NAME = 'FastCircularDependencyPlugin';
 
 export interface IFastCircularDependencyPluginOptions {
+    /** if provided, cycles where every module path matches this regex will not be reported */
     exclude?: RegExp;
+    /** if provided, only cycles where at least one module path matches this regex will be reported */
     include?: RegExp;
+    /** if true, the plugin will cause the build to fail if a circular dependency is detected */
     failOnError?: boolean;
+    /** if true, the plugin will not report cycles that include an async dependency, e.g. via import(/* webpackMode: "weak" / './file.js') */
     allowAsyncCycles?: boolean;
+    /** called when a cycle is detected, any exception thrown by this callback will be added to compilation errors */
     onDetected?: ((options: { module: NormalModule, paths: string[], compilation: Compilation }) => void) | null;
+    /** called before the cycle detection starts */
     onStart?: ((options: { compilation: Compilation }) => void) | null;
+    /** called after the cycle detection ends */
     onEnd?: ((options: { compilation: Compilation }) => void) | null;
+    /** current working directory for displaying module paths */
     cwd?: string;
-}
-
-class ModulesGraph {
-    public modules: NormalModule[];
-
-    private graph = new Graph();
-
-    constructor() {
-        this.modules = [];
-    }
-
-    addModule(module: NormalModule) {
-        const moduleIndex = this.modules.indexOf(module);
-        if (moduleIndex === -1) {
-            this.modules.push(module);
-            return String(this.modules.length - 1);
-        }
-        return String(moduleIndex);
-    }
-
-    registerDependency(moduleIndex: string, dependencyIndices: string[]) {
-        this.graph.add(moduleIndex, dependencyIndices);
-    }
-
-    getCycles(): number[][] {
-        return this.graph.getCycles()
-            .reverse()
-            .map((path) => path.map((vertex) => Number(vertex.name)).reverse());
-    }
-
-    getPath(moduleIds: number[]) {
-        return [...moduleIds.map((moduleId) => this.modules[moduleId]), this.modules[moduleIds[0]]];
-    }
-}
-
-class CycleDependencyError extends WebpackError {
-    public paths: string[];
-
-    constructor(paths: string[]) {
-        super(`Circular dependency detected:\r\n ${paths.join(' -> ')}`);
-        this.paths = paths;
-    }
 }
 
 export default class FastCircularDependencyPlugin {
@@ -81,15 +47,17 @@ export default class FastCircularDependencyPlugin {
             compilation.hooks.optimizeModules.tap(PLUGIN_NAME, (modules) => {
                 this.options.onStart?.({ compilation });
 
-                const graph = new ModulesGraph();
+                const graph = new Graph();
+                const hasOnDetectedCallback = !!this.options.onDetected;
+                const resourceToModuleMapping = hasOnDetectedCallback ? new Map<string, NormalModule>() : null;
 
                 for (const module of modules) {
-                    if (!(module instanceof NormalModule)) {
+                    if (!(module instanceof compiler.webpack.NormalModule) || !module.resource) {
                         continue;
                     }
 
-                    const moduleIndex = graph.addModule(module);
-                    const dependencyIndices = [];
+                    resourceToModuleMapping?.set(module.resource, module);
+                    const dependencyResources = [];
 
                     for (const dependency of module.dependencies) {
                         const dependencyModule = compilation.moduleGraph.getModule(dependency);
@@ -98,7 +66,7 @@ export default class FastCircularDependencyPlugin {
                             continue;
                         }
 
-                        if (!dependencyModule || !(dependencyModule instanceof NormalModule)) {
+                        if (!dependencyModule || !(dependencyModule instanceof compiler.webpack.NormalModule) || !dependencyModule.resource) {
                             continue;
                         }
 
@@ -107,27 +75,26 @@ export default class FastCircularDependencyPlugin {
                             continue;
                         }
 
-                        const dependencyModuleIndex = graph.addModule(dependencyModule);
-                        dependencyIndices.push(dependencyModuleIndex);
+                        resourceToModuleMapping?.set(module.resource, module);
+                        dependencyResources.push(dependencyModule.resource);
                     }
-                    graph.registerDependency(moduleIndex, dependencyIndices);
+                    graph.add(module.resource, dependencyResources);
                 }
 
-                const cycles = graph.getCycles();
+                const cycles = graph.getCycles().map((cycle) => [...cycle.reverse(), cycle[0]]);
                 for (const cycle of cycles) {
-                    const cycleModules = graph.getPath(cycle);
-                    const cycleModuleAbsolutePaths = cycleModules.map((module) => module.resource).filter(Boolean);
-                    const everyPartOfCycleIsExcluded = cycleModuleAbsolutePaths.every((path) => (
-                        this.options.exclude.test(path) || !this.options.include.test(path)
+                    const everyPartOfCycleIsExcluded = cycle.every((vertex) => (
+                        this.options.exclude.test(vertex.name) || !this.options.include.test(vertex.name)
                     ));
                     if (everyPartOfCycleIsExcluded) {
                         continue;
                     }
-                    const cycleModulePaths = cycleModuleAbsolutePaths.map((p) => path.relative(this.options.cwd, p));
+
+                    const cycleModulePaths = cycle.map((vertex) => path.relative(this.options.cwd, vertex.name));
                     if (this.options.onDetected) {
                         try {
                             this.options.onDetected({
-                                module: graph.modules[cycle[0]],
+                                module: resourceToModuleMapping!.get(cycle[0].name)!,
                                 paths: cycleModulePaths,
                                 compilation,
                             });
@@ -137,7 +104,8 @@ export default class FastCircularDependencyPlugin {
                         continue;
                     }
 
-                    const error = new CycleDependencyError(cycleModulePaths);
+                    const errorMessage = `Circular dependency detected:\r\n ${cycleModulePaths.join(' -> ')}`;
+                    const error = new compiler.webpack.WebpackError(errorMessage);
                     if (this.options.failOnError) {
                         compilation.errors.push(error);
                     } else {

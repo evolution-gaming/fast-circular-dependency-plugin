@@ -230,7 +230,7 @@ describe('circular dependency', () => {
         const stats = await runAsync();
 
         const msg0 = getWarningMessage(stats);
-        expect(msg0).toContain('__tests__/deps/module-concat-plugin-compat/b.js -> __tests__/deps/module-concat-plugin-compat/a.js -> __tests__/deps/module-concat-plugin-compat/b.js');
+        expect(msg0).toContain('__tests__/deps/module-concat-plugin-compat/a.js -> __tests__/deps/module-concat-plugin-compat/b.js -> __tests__/deps/module-concat-plugin-compat/a.js');
     });
 
     describe('ignores self referencing webpack internal dependencies', () => {
