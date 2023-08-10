@@ -54,7 +54,7 @@ export default class FastCircularDependencyPlugin {
                 const graph = new Graph();
 
                 for (const module of modules) {
-                    if (!(module instanceof compiler.webpack.NormalModule) || !module.resource) {
+                    if (!(module instanceof compiler.webpack.NormalModule) || !module.resource || module.dependencies.length === 0) {
                         continue;
                     }
 
@@ -81,8 +81,7 @@ export default class FastCircularDependencyPlugin {
                     graph.add(module.resource, dependencyResources);
                 }
 
-                const cycles = graph.getCycles().map((cycle) => [...cycle.reverse(), cycle[0]]);
-                for (const cycle of cycles) {
+                for (const cycle of graph.getCycles()) {
                     const everyPartOfCycleIsExcluded = cycle.every((vertex) => (
                         this.options.exclude.test(vertex.name) || !this.options.include.test(vertex.name)
                     ));
@@ -90,7 +89,9 @@ export default class FastCircularDependencyPlugin {
                         continue;
                     }
 
-                    const cycleModulePaths = cycle.map((vertex) => path.relative(this.options.cwd, vertex.name));
+                    const cycleModulePaths = cycle.map((vertex) => path.relative(this.options.cwd, vertex.name)).reverse();
+                    cycleModulePaths.push(cycleModulePaths[0]);
+
                     if (this.options.onDetected) {
                         try {
                             this.options.onDetected({
