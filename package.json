@@ -8,6 +8,7 @@
     "build/index.d.ts",
     "build/index.js.map"
   ],
+  "type": "module",
   "types": "build/index.d.ts",
   "scripts": {
     "test": "jest",
