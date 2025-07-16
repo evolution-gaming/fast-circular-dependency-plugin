@@ -1,8 +1,9 @@
 {
   "name": "@evolution-gaming/fast-circular-dependency-plugin",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "",
   "main": "build/index.js",
+  "type": "module",
   "files": [
     "build/index.js",
     "build/index.d.ts",
@@ -28,7 +29,7 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.3",
-    "@types/memory-fs": "^0.3.3",
+    "@types/memory-fs": "^0.3.7",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@typescript-eslint/parser": "^6.2.1",
     "eslint": "^8.46.0",

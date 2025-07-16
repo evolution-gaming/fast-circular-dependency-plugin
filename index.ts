@@ -1,6 +1,8 @@
 import path from 'path';
 import type { Compiler, Compilation, WebpackError } from 'webpack';
-import Graph from 'tarjan-graph';
+import tarjanModule from "tarjan-graph";
+
+const Graph: typeof import("tarjan-graph").default = ((tarjanModule as any).default) ?? tarjanModule;
 
 const PLUGIN_NAME = 'FastCircularDependencyPlugin';
 
