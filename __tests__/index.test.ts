@@ -1,7 +1,7 @@
 import path from 'path';
 import MemoryFS from 'memory-fs';
-import webpack, { WebpackError } from 'webpack';
-import FastCircularDependencyPlugin from '../index';
+import webpack, { OutputFileSystem, WebpackError } from 'webpack';
+import FastCircularDependencyPlugin from '../index.ts';
 
 function wrapRun(run: typeof webpack.Compiler.prototype.run): () => Promise<webpack.StatsCompilation> {
     return () => new Promise((resolve, reject) => {
@@ -30,7 +30,7 @@ describe('circular dependency', () => {
             output: { path: __dirname },
             plugins: [new FastCircularDependencyPlugin()],
         });
-        compiler.outputFileSystem = fs;
+        compiler.outputFileSystem = fs as unknown as OutputFileSystem;
 
         const runAsync = wrapRun(compiler.run.bind(compiler));
         const stats = await runAsync();
@@ -47,7 +47,7 @@ describe('circular dependency', () => {
             output: { path: __dirname },
             plugins: [new FastCircularDependencyPlugin()],
         });
-        compiler.outputFileSystem = fs;
+        compiler.outputFileSystem = fs as unknown as OutputFileSystem;
 
         const runAsync = wrapRun(compiler.run.bind(compiler));
         const stats = await runAsync();
@@ -66,7 +66,7 @@ describe('circular dependency', () => {
                 failOnError: true,
             })],
         });
-        compiler.outputFileSystem = fs;
+        compiler.outputFileSystem = fs as unknown as OutputFileSystem;
 
         const runAsync = wrapRun(compiler.run.bind(compiler));
         const stats = await runAsync();
@@ -87,7 +87,7 @@ describe('circular dependency', () => {
                 }),
             ],
         });
-        compiler.outputFileSystem = fs;
+        compiler.outputFileSystem = fs as unknown as OutputFileSystem;
 
         const runAsync = wrapRun(compiler.run.bind(compiler));
         const stats = await runAsync();
@@ -108,7 +108,7 @@ describe('circular dependency', () => {
                 }),
             ],
         });
-        compiler.outputFileSystem = fs;
+        compiler.outputFileSystem = fs as unknown as OutputFileSystem;
 
         const runAsync = wrapRun(compiler.run.bind(compiler));
         const stats = await runAsync();
@@ -126,7 +126,7 @@ describe('circular dependency', () => {
                 new FastCircularDependencyPlugin(),
             ],
         });
-        compiler.outputFileSystem = fs;
+        compiler.outputFileSystem = fs as unknown as OutputFileSystem;
 
         const runAsync = wrapRun(compiler.run.bind(compiler));
         const stats = await runAsync();
@@ -151,7 +151,7 @@ describe('circular dependency', () => {
                 }),
             ],
         });
-        compiler.outputFileSystem = fs;
+        compiler.outputFileSystem = fs as unknown as OutputFileSystem;
 
         const runAsync = wrapRun(compiler.run.bind(compiler));
         const stats = await runAsync();
@@ -176,7 +176,7 @@ describe('circular dependency', () => {
                 }),
             ],
         });
-        compiler.outputFileSystem = fs;
+        compiler.outputFileSystem = fs as unknown as OutputFileSystem;
 
         const runAsync = wrapRun(compiler.run.bind(compiler));
         const stats = await runAsync();
@@ -204,7 +204,7 @@ describe('circular dependency', () => {
                 }),
             ],
         });
-        compiler.outputFileSystem = fs;
+        compiler.outputFileSystem = fs as unknown as OutputFileSystem;
 
         const runAsync = wrapRun(compiler.run.bind(compiler));
         const stats = await runAsync();
@@ -224,7 +224,7 @@ describe('circular dependency', () => {
                 new FastCircularDependencyPlugin(),
             ],
         });
-        compiler.outputFileSystem = fs;
+        compiler.outputFileSystem = fs as unknown as OutputFileSystem;
 
         const runAsync = wrapRun(compiler.run.bind(compiler));
         const stats = await runAsync();
@@ -242,7 +242,7 @@ describe('circular dependency', () => {
                 output: { path: __dirname },
                 plugins: [new FastCircularDependencyPlugin()],
             });
-            compiler.outputFileSystem = fs;
+            compiler.outputFileSystem = fs as unknown as OutputFileSystem;
 
             const runAsync = wrapRun(compiler.run.bind(compiler));
             const stats = await runAsync();
@@ -259,7 +259,7 @@ describe('circular dependency', () => {
                 output: { path: __dirname },
                 plugins: [new FastCircularDependencyPlugin()],
             });
-            compiler.outputFileSystem = fs;
+            compiler.outputFileSystem = fs as unknown as OutputFileSystem;
 
             const runAsync = wrapRun(compiler.run.bind(compiler));
             const stats = await runAsync();
@@ -276,7 +276,7 @@ describe('circular dependency', () => {
                 output: { path: __dirname },
                 plugins: [new FastCircularDependencyPlugin()],
             });
-            compiler.outputFileSystem = fs;
+            compiler.outputFileSystem = fs as unknown as OutputFileSystem;
 
             const runAsync = wrapRun(compiler.run.bind(compiler));
             const stats = await runAsync();
@@ -307,7 +307,7 @@ describe('circular dependency', () => {
                 },
                 plugins: [new FastCircularDependencyPlugin()],
             });
-            compiler.outputFileSystem = fs;
+            compiler.outputFileSystem = fs as unknown as OutputFileSystem;
 
             const runAsync = wrapRun(compiler.run.bind(compiler));
             const stats = await runAsync();
