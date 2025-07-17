@@ -1,7 +1,7 @@
 import path from 'path';
 import MemoryFS from 'memory-fs';
 import webpack, { OutputFileSystem, WebpackError } from 'webpack';
-import FastCircularDependencyPlugin from '../index.ts';
+import { FastCircularDependencyPlugin } from '../index';
 
 function wrapRun(run: typeof webpack.Compiler.prototype.run): () => Promise<webpack.StatsCompilation> {
     return () => new Promise((resolve, reject) => {

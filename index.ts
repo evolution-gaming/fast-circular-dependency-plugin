@@ -31,7 +31,7 @@ export interface IFastCircularDependencyPluginOptions {
     cwd?: string;
 }
 
-export default class FastCircularDependencyPlugin {
+export class FastCircularDependencyPlugin {
     private options: Required<IFastCircularDependencyPluginOptions>;
 
     constructor(options?: IFastCircularDependencyPluginOptions) {
