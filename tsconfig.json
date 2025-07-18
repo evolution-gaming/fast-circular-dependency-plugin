@@ -12,6 +12,7 @@
       "noUnusedParameters": true,
       "noImplicitReturns": true,
       "noFallthroughCasesInSwitch": true,
+      "rewriteRelativeImportExtensions": true,
 
       "moduleResolution": "node16",
       "esModuleInterop": true,
@@ -24,7 +25,7 @@
 
         // just for linting purposes
         "__tests__/index.test.ts",
-        "jest.config.js",
+        "jest.config.cjs",
         ".eslintrc.js"
     ]
   }

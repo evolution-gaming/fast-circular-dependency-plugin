@@ -60,7 +60,7 @@ export default class FastCircularDependencyPlugin {
                         continue;
                     }
 
-                    const dependencyResources = [];
+                    const dependencyResources: string[] = [];
 
                     for (const dependency of module.dependencies) {
                         const dependencyModule = compilation.moduleGraph.getModule(dependency);
