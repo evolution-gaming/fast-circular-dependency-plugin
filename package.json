@@ -28,7 +28,9 @@
     "webpack": ">=5.0.0"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.3",
+    "@babel/core": "^7.28.0",
+    "@babel/preset-env": "^7.28.0",
+    "@types/jest": "^29.5.14",
     "@types/memory-fs": "^0.3.7",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@typescript-eslint/parser": "^6.2.1",
@@ -39,7 +41,7 @@
     "memory-fs": "^0.5.0",
     "ts-jest": "^29.1.1",
     "ts-loader": "^9.4.4",
-    "typescript": "^5.1.6",
+    "typescript": "^5.7.0",
     "webpack": "^5.88.2"
   },
   "dependencies": {
