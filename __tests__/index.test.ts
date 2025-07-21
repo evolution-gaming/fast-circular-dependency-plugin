@@ -19,7 +19,7 @@ const getWarningMessage = (stats: webpack.StatsCompilation) => getStatsMessage(s
 
 const getErrorsMessage = (stats: webpack.StatsCompilation) => getStatsMessage(stats, 'errors');
 
-let getStatsMessage = (stats: webpack.StatsCompilation, type: 'errors' | 'warnings') => stats[type]?.[0]?.message || null;
+const getStatsMessage = (stats: webpack.StatsCompilation, type: 'errors' | 'warnings') => stats[type]?.[0]?.message || null;
 
 describe('circular dependency', () => {
     it('detects circular dependencies from a -> b -> c -> b', async () => {
