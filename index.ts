@@ -69,12 +69,12 @@ export default class FastCircularDependencyPlugin {
                             continue;
                         }
 
-                        if (!dependencyModule || !(dependencyModule instanceof compiler.webpack.NormalModule) || !dependencyModule.resource) {
+                        if (!dependencyModule || !(dependencyModule instanceof compiler.webpack.NormalModule) || !dependencyModule.resource || (dependencyModule.resource === module.resource)) {
                             continue;
                         }
 
                         // optionally ignore dependencies that are resolved asynchronously
-                        if (this.options.allowAsyncCycles && dependency.weak) {
+                        if (this.options.allowAsyncCycles && dependency instanceof compiler.webpack.dependencies.ModuleDependency && dependency.weak) {
                             continue;
                         }
 
