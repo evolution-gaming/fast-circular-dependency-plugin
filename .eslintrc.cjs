@@ -13,7 +13,7 @@ module.exports = {
         project: './tsconfig.json',
     },
     rules: {
-        '@typescript-eslint/indent': ['error', 4],
+        'indent': ['error', 4],
         '@typescript-eslint/no-shadow': 'off',
         '@typescript-eslint/no-use-before-define': 'off',
         '@typescript-eslint/no-loop-func': 'off',

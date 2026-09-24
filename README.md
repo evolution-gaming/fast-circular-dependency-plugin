@@ -6,14 +6,15 @@ Circular dependencies are often a necessity in complex software, the presence of
 
 **Note**: this is a drop-in replacement for `CircularDependencyPlugin` which uses a faster algorithm drastically improving performance. All options and callbacks are the same, but this plugin requires `webpack` >= 5. See below for a slightly edited original readme.
 
+The package is published as an ES module, so use `import` (e.g. in a `webpack.config.mjs`, or a `webpack.config.js` in a `"type": "module"` project). On Node.js versions that support `require()` of ES modules (>= 20.19), `require('@evolution-gaming/fast-circular-dependency-plugin').default` also works.
+
 ### Basic Usage
 
 ```js
-// webpack.config.js
-const FastCircularDependencyPlugin = require('fast-circular-dependency-plugin').default;
-// or import FastCircularDependencyPlugin from 'fast-circular-dependency-plugin'
+// webpack.config.mjs
+import FastCircularDependencyPlugin from '@evolution-gaming/fast-circular-dependency-plugin';
 
-module.exports = {
+export default {
   entry: "./src/index",
   plugins: [
     new FastCircularDependencyPlugin({
@@ -37,11 +38,10 @@ module.exports = {
 ### Advanced Usage
 
 ```js
-// webpack.config.js
-const FastCircularDependencyPlugin = require('fast-circular-dependency-plugin').default;
-// or import FastCircularDependencyPlugin from 'fast-circular-dependency-plugin'
+// webpack.config.mjs
+import FastCircularDependencyPlugin from '@evolution-gaming/fast-circular-dependency-plugin';
 
-module.exports = {
+export default {
   entry: "./src/index",
   plugins: [
     new FastCircularDependencyPlugin({
@@ -70,14 +70,13 @@ count is exceeded. (Note if you care about detecting a cycle being replaced by
 another, this won't catch that.)
 
 ```js
-// webpack.config.js
-const FastCircularDependencyPlugin = require('fast-circular-dependency-plugin').default;
-// or import FastCircularDependencyPlugin from 'fast-circular-dependency-plugin'
+// webpack.config.mjs
+import FastCircularDependencyPlugin from '@evolution-gaming/fast-circular-dependency-plugin';
 
 const MAX_CYCLES = 5;
 let numCyclesDetected = 0;
 
-module.exports = {
+export default {
   entry: "./src/index",
   plugins: [
     new FastCircularDependencyPlugin({
